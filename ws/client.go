@@ -59,10 +59,7 @@ func (c *Client) Connect(ctx context.Context) error {
 
 // readMessages 持续读取 WebSocket 消息
 func (c *Client) readMessages(ctx context.Context) {
-	defer func() {
-		c.conn.Close()
-		close(c.done)
-	}()
+	defer c.Close() // 确保资源释放
 
 	for {
 		select {

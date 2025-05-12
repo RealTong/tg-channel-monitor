@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"crypto-message-benchmark/utils"
-	"crypto-message-benchmark/ws"
 	"log"
 	"os"
 	"os/signal"
@@ -65,7 +64,7 @@ func main() {
 	appHash := env.appHash
 	sessionPath := env.sessionPath
 	phone := env.phone
-	wsPort := env.wsPort
+	// wsPort := env.wsPort
 
 	sessionStorage := &session.FileStorage{
 		Path: sessionPath,
@@ -80,32 +79,32 @@ func main() {
 	})
 
 	// 启动 WebSocket 服务器
-	go func() {
-		log.Printf("启动 WebSocket 服务器，端口: %s", wsPort)
-		ws.Start(wsPort)
-	}()
+	// go func() {
+	// 	log.Printf("启动 WebSocket 服务器，端口: %s", wsPort)
+	// 	ws.Start(wsPort)
+	// }()
 
-	// 启动 WebSocket 客户端
-	log.Printf("启动 WebSocket 客户端，连接到: %s", "wss://bwenews-api.bwe-ws.com/ws")
-	// 获取当前时间戳 毫秒级别
-	wsClient := ws.NewClient("wss://bwenews-api.bwe-ws.com/ws", func(message ws.Message) {
-		log.Printf("收到 WebSocket 消息：%+v", message)
-		currentTimems := time.Now().UnixNano() / 1e6
-		// 通过 Bot 发送 WebSocket 消息到 Telegram
-		messageText := "BWENews WebSocket 消息:\n类型：" + message.SourceName + "\n内容：" + message.NewsTitle + "\n时间戳：" + strconv.FormatInt(currentTimems, 10)
-		if err := utils.SendBotMessage(messageText); err != nil {
-			log.Printf("发送 WebSocket 消息到 Telegram 失败: %v", err)
-		} else {
-			log.Printf("WebSocket 消息已转发到 Telegram")
-		}
-	})
+	// // 启动 WebSocket 客户端
+	// log.Printf("启动 WebSocket 客户端，连接到: %s", "wss://bwenews-api.bwe-ws.com/ws")
+	// // 获取当前时间戳 毫秒级别
+	// wsClient := ws.NewClient("wss://bwenews-api.bwe-ws.com/ws", func(message ws.Message) {
+	// 	log.Printf("收到 WebSocket 消息：%+v", message)
+	// 	currentTimems := time.Now().UnixNano() / 1e6
+	// 	// 通过 Bot 发送 WebSocket 消息到 Telegram
+	// 	messageText := "BWENews WebSocket 消息:\n类型：" + message.SourceName + "\n内容：" + message.NewsTitle + "\n时间戳：" + strconv.FormatInt(currentTimems, 10)
+	// 	if err := utils.SendBotMessage(messageText); err != nil {
+	// 		log.Printf("发送 WebSocket 消息到 Telegram 失败: %v", err)
+	// 	} else {
+	// 		log.Printf("WebSocket 消息已转发到 Telegram")
+	// 	}
+	// })
 
-	go func() {
-		if err := wsClient.Connect(ctx); err != nil {
-			log.Printf("WebSocket 连接失败: %v", err)
-		}
-	}()
-	defer wsClient.Close()
+	// go func() {
+	// 	if err := wsClient.Connect(ctx); err != nil {
+	// 		log.Printf("WebSocket 连接失败: %v", err)
+	// 	}
+	// }()
+	// defer wsClient.Close()
 
 	// 启动 Telegram 客户端
 	err := client.Run(ctx, func(ctx context.Context) error {
@@ -123,7 +122,7 @@ func main() {
 		}
 
 		// 获取源频道 ID
-		monitorChannels := []string{"BWENews", "news6551", "NewListingsFeed"}
+		monitorChannels := []string{"BWENews", "news6551", "NewListingsFeed", "TrumpTruthSocial_Alert"}
 
 		// 注册频道消息处理器
 		dispatcher.OnNewChannelMessage(func(ctx context.Context, e tg.Entities, update *tg.UpdateNewChannelMessage) error {
